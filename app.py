@@ -1,19 +1,93 @@
 import streamlit as st
-from multiapp import MultiApp
-from apps import home, data, model # import your app modules here
+import pandas as pd
 
-app = MultiApp()
 
-st.markdown("""
-# Multi-Page App
 
-This multi-page app is using the [streamlit-multiapps](https://github.com/upraneelnihar/streamlit-multiapps) framework developed by [Praneel Nihar](https://medium.com/@u.praneel.nihar). Also check out his [Medium article](https://medium.com/@u.praneel.nihar/building-multi-page-web-app-using-streamlit-7a40d55fa5b4).
 
-""")
+# Security
+#passlib,hashlib,bcrypt,scrypt
+import hashlib
+def make_hashes(password):
+	return hashlib.sha256(str.encode(password)).hexdigest()
 
-# Add all your application here
-app.add_app("Home", home.app)
-app.add_app("Data", data.app)
-app.add_app("Model", model.app)
-# The main app
-app.run()
+def check_hashes(password,hashed_text):
+	if make_hashes(password) == hashed_text:
+		return hashed_text
+	return False
+# DB Management
+import sqlite3 
+conn = sqlite3.connect('data.db')
+c = conn.cursor()
+# DB  Functions
+def create_usertable():
+	c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)')
+
+
+def add_userdata(username,password):
+	c.execute('INSERT INTO userstable(username,password) VALUES (?,?)',(username,password))
+	conn.commit()
+
+create_usertable()
+add_userdata("Adam",make_hashes("sm"))
+
+def login_user(username,password):
+	c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
+	data = c.fetchall()
+	return data
+
+
+def view_all_users():
+	c.execute('SELECT * FROM userstable')
+	data = c.fetchall()
+	return data
+
+
+
+def main():
+	"""Simple Login App"""
+	from PIL import Image
+	image = Image.open('sunrise.jpg')
+
+	st.image(image, caption='Sunrise by the mountains')
+
+	st.title("Simple Login App")
+
+	menu = ["Home","Login"]
+	choice = st.sidebar.selectbox("Menu",menu)
+
+	if choice == "Home":
+		st.subheader("Home")
+
+	elif choice == "Login":
+		st.subheader("Login Section")
+
+		username = st.sidebar.text_input("User Name")
+		password = st.sidebar.text_input("Password",type='password')
+		if st.sidebar.checkbox("Login"):
+			# if password == '12345':
+			create_usertable()
+			hashed_pswd = make_hashes(password)
+
+			result = login_user(username,check_hashes(password,hashed_pswd))
+			if result:
+
+				st.success("Logged In as {}".format(username))
+
+				task = st.selectbox("Task",["Add Post","Analytics","Profiles"])
+				if task == "Add Post":
+					st.subheader("Add Your Post")
+
+				elif task == "Analytics":
+					st.subheader("Analytics")
+				elif task == "Profiles":
+					st.subheader("User Profiles")
+					user_result = view_all_users()
+					clean_db = pd.DataFrame(user_result,columns=["Username","Password"])
+					st.dataframe(clean_db)
+			else:
+				st.warning("Incorrect Username/Password")
+
+
+
+if __name__ == '__main__':
+	main()
