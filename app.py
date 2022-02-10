@@ -48,7 +48,7 @@ def main():
 	from PIL import Image
 	image = Image.open('sunrise.jpg')
 
-	st.image(image, caption='Sunrise by the mountains', width = 480)
+	st.image(image, caption='Sunrise by the mountains', width = 360)
 
 	st.title("Simple Login App")
 
