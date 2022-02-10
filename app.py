@@ -46,7 +46,7 @@ def view_all_users():
 def main():
 	"""Simple Login App"""
 	from PIL import Image
-	image = Image.open('sunrise.jpg')
+	image = Image.open('sunrise.jpg', width = 500)
 
 	st.image(image, caption='Sunrise by the mountains')
 
