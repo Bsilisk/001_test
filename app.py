@@ -1,97 +1,35 @@
 import streamlit as st
-import pandas as pd
 
+# Text files
 
+text_contents = '''
+Foo, Bar
+123, 456
+789, 000
+'''
 
+# Different ways to use the API
 
-# Security
-#passlib,hashlib,bcrypt,scrypt
-import hashlib
-def make_hashes(password):
-	return hashlib.sha256(str.encode(password)).hexdigest()
+st.download_button('Download CSV', text_contents, 'text/csv')
+st.download_button('Download CSV', text_contents)  # Defaults to 'text/plain'
 
-def check_hashes(password,hashed_text):
-	if make_hashes(password) == hashed_text:
-		return hashed_text
-	return False
-# DB Management
-import sqlite3 
-conn = sqlite3.connect('data.db')
-c = conn.cursor()
-# DB  Functions
-def create_usertable():
-	c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)')
+with open('myfile.csv') as f:
+   st.download_button('Download CSV', f)  # Defaults to 'text/plain'
 
+# ---
+# Binary files
 
-def add_userdata(username,password):
-	c.execute('INSERT INTO userstable(username,password) VALUES (?,?)',(username,password))
-	conn.commit()
+binary_contents = b'whatever'
 
-create_usertable()
-add_userdata("Adam",make_hashes("sm"))
+# Different ways to use the API
 
-def login_user(username,password):
-	c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
-	data = c.fetchall()
-	return data
+st.download_button('Download file', binary_contents)  # Defaults to 'application/octet-stream'
 
+with open('myfile.zip', 'rb') as f:
+   st.download_button('Download Zip', f, file_name='archive.zip')  # Defaults to 'application/octet-stream'
 
-def view_all_users():
-	c.execute('SELECT * FROM userstable')
-	data = c.fetchall()
-	return data
+# You can also grab the return value of the button,
+# just like with any other button.
 
-
-
-def main():
-	"""Simple Login App"""
-	from PIL import Image
-	image = Image.open('sunrise.jpg')
-
-	st.image(image, caption='Sunrise by the mountains', width = 240)
-
-	st.title("Simple Login App")
-
-	menu = ["Home","Login"]
-	choice = st.sidebar.selectbox("Menu",menu)
-
-	if choice == "Home":
-		st.subheader("Home")
-
-	elif choice == "Login":
-		st.subheader("Login Section")
-
-		username = st.sidebar.text_input("User Name")
-		password = st.sidebar.text_input("Password",type='password')
-		if st.sidebar.checkbox("Login"):
-			# if password == '12345':
-			create_usertable()
-			hashed_pswd = make_hashes(password)
-
-			result = login_user(username,check_hashes(password,hashed_pswd))
-			if result:
-
-				st.success("Logged In as {}".format(username))
-
-				task = st.selectbox("Task",["Add Post","Analytics","Profiles"])
-				if task == "Add Post":
-					st.subheader("Add Your Post")
-
-				elif task == "Analytics":
-					st.subheader("Analytics")
-				elif task == "Profiles":
-					st.subheader("User Profiles")
-					user_result = view_all_users()
-					clean_db = pd.DataFrame(user_result,columns=["Username","Password"])
-					st.dataframe(clean_db)
-			else:
-				st.warning("Incorrect Username/Password")
-
-	uploaded_files = st.file_uploader("Choose a CSV file", accept_multiple_files=True)
-	for uploaded_file in uploaded_files:
-	     bytes_data = uploaded_file.read()
-	     st.write("filename:", uploaded_file.name)
-	     st.write(bytes_data)
-
-if __name__ == '__main__':
-	main()
+if st.download_button(...):
+   st.write('Thanks for downloading!')
