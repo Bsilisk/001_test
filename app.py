@@ -6,11 +6,7 @@ import streamlit as st
 import pandas as pd
 import math
 
-from bokeh.layouts import gridplot
-from bokeh.plotting import figure, show
-from bokeh.palettes import Dark2_5 as palette
 import itertools
-from bokeh.palettes import Magma, Inferno, Plasma, Viridis, Cividis, Paired
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
