@@ -5,7 +5,6 @@ import pandas as pd
 import math
 
 import itertools
-from bokeh.palettes import Magma, Inferno, Plasma, Viridis, Cividis, Paired
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
